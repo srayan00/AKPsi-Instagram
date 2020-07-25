@@ -1,5 +1,5 @@
 ---
-title: "instagram"
+title: "Instagram"
 author: "Sahana Rayan"
 date: "July 25, 2020"
 output: html_document
@@ -9,22 +9,160 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r message=FALSE}
+library(tidyverse)
 ```
 
-## Including Plots
+#Reading the file 
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+instagram_post_data <- read.csv("C:\\Users\\sahan\\Downloads\\dataset_my-task_2020-07-08_16-55-57-529.csv")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+#Are sidecars more interactive than just an image post.
+- The interactiveness of a post will be measures by likes and comments received
+
+```{r}
+#table(instagram_post_data$type)
+instagram_post_data %>% 
+  filter(type != "Video") %>% 
+  ggplot(aes(x = type, y = likesCount)) +
+  geom_violin(size = 1.2, color = "#ED8B00", fill = "#3A5382") +
+  geom_boxplot(width = 0.2, fill = "#EAAA00", color = "#ED8B00") +
+  theme_bw() +
+  xlab("Types of posts") + ylab("Number of likes") +
+  labs(
+    title = "Distribution of likes for sidecars and images",
+    caption = "Which type of post is more interactive"
+  ) +
+  scale_y_continuous(breaks = c(25, 50, 75, 100, 125)) +
+  theme(
+    legend.position = "none",
+    plot.background = element_rect(fill = "#3A5382",
+                                   colour = "black",
+                                   size = 1),
+    axis.text = element_text(color = "white"),
+    axis.title = element_text(color = "white"),
+    plot.title = element_text(color = "white", hjust = "0.5"),
+    plot.caption = element_text(color = "white"),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.background = element_rect(fill = "#3A5382")
+  ) +
+  coord_flip()
+```
+
+```{r}
+instagram_post_data %>% 
+  filter(type != "Video") %>% 
+  ggplot(aes(x = type, y = commentsCount)) +
+  geom_boxplot(size = 1.2, width = 0.3, fill = "#EAAA00", color = "#ED8B00") +
+  theme_bw() +
+  xlab("Types of posts") + ylab("Number of comments") +
+  labs(
+    title = "Distribution of likes for sidecars and images",
+    caption = "Which type of post is more interactive"
+  ) +
+  theme(
+    legend.position = "none",
+    plot.background = element_rect(fill = "#2D68C4",
+                                   colour = "black",
+                                   size = 1),
+    axis.text = element_text(color = "white"),
+    axis.title = element_text(color = "white"),
+    plot.title = element_text(color = "white", hjust = "0.5"),
+    plot.caption = element_text(color = "white")
+  ) +
+  coord_flip()
+
+```
+
+
+- From both these graphs, it can be concluded that sidecars seem to receive more likes and comments in general.
+
+#Does the number of hashtags used for a post correlate to the number of likes
+- I see a lot of public accounts use hashtags for the post to appear in non-follower's feeds. I am interested to see how effective this marketing strategy is.
+
+
+```{r} 
+#This code helps count the hashtags
+hashtagcols <- c("hashtags.0", "hashtags.1", "hashtags.2", "hashtags.3", "hashtags.4", "hashtags.5", "hashtags.6", 
+                 "hashtags.7", "hashtags.8", "hashtags.9", "hashtags.10", "hashtags.11", "hashtags.12", "hashtags.13",
+                "hashtags.14", "hashtags.15", "hashtags.16", "hashtags.17", "hashtags.18", "hashtags.19", "hashtags.20",
+                 "hashtags.21", "hashtags.22", "hashtags.23", "hashtags.24", "hashtags.25", "hashtags.26","hashtags.27",
+                 "hashtags.28", "hashtags.29") 
+
+for (row in 1:nrow(instagram_post_data)) {
+    count <- 0
+    for (value in hashtagcols) {
+      if (instagram_post_data[row, value] != "") {
+        count <- count + 1
+      }
+    }
+    instagram_post_data[row, "hashtagCount"] = count
+  }
+```
+
+- This is what the distributions of hashtagcount variable is
+
+```{r message = FALSE}
+instagram_post_data %>% 
+  ggplot(aes(x = hashtagCount)) +
+  geom_histogram() +
+  geom_density() +
+  theme_bw()
+```
+
+- This distribution is used to keep only hashtagcounts with over 6 posts to remove outliers
+```{r message = FALSE}
+instagram_post_data %>%  
+  group_by(hashtagCount) %>% 
+  summarize(meanLikes = mean(likesCount), count = n()) %>% 
+  filter (count >= 6) %>% 
+  ggplot(aes(x = as.factor(hashtagCount))) +
+  geom_bar(aes(y = meanLikes),
+           stat = "identity",
+           color = "#8E6F3E",
+           fill = "#CFB991",
+           size = 1.2) +
+  xlab("Number of Hashtags") + ylab("Average likes") +
+  labs(title = "Bar Chart of Average Likes for posts of different number of hashtags") +
+  theme_classic()
+  # theme(
+  #   panel.background = element_rect(fill = "black", color = "white"),
+  #   plot.background = element_rect(fill = "black"),
+  #   axis.text = element_text(color = "white"),
+  #   axis.title = element_text(color = "white"),
+  #   plot.title = element_text(color = "white", hjust = "0.5"),
+  #   panel.grid.major.x = element_blank(),
+  #   panel.grid.minor.x = element_blank(),
+  #   panel.grid.major.y = element_blank(),
+  #   panel.grid.minor.y = element_blank()
+  # )
+```
+
+- From this graph, I understand that there is a high correlation betweeen the number of hashtags and number of likes on a post.
+- __NOTE: Correlation does not mean causation. I am, in no way, a causal inference expert deduce anything like that.__ But I can analyze patterns.
+
+#What are the most effective hashtags then?
+- The last research question led me to wonder what hashtags are effective in bringing likes and comments. What hashtags bring the most public attention. 
+
+```{r}
+hashtag_data <- instagram_post_data %>% 
+  pivot_longer(hashtagcols,
+               names_to = "HashtagNo",
+               values_to = "HashtagDesc") %>% 
+  filter(HashtagDesc != "")
+hashtag_data %>% 
+  group_by(HashtagDesc) %>% 
+  summarize(avg_likes = mean(likesCount), count = n()) %>% 
+  filter(count > 10) %>% 
+  arrange(avg_likes)
+  filter(count >= 16) %>% 
+  ggplot(aes(x = HashtagDesc)) +
+  geom_bar(aes(y = avg_likes), 
+           stat = "identity") +
+  theme_bw()
+```
