@@ -9,18 +9,18 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r message=FALSE}
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 library(tidyverse)
 ```
 
-#Reading the file 
-
-```{r}
+```{r echo = FALSE}
 instagram_post_data <- read.csv("C:\\Users\\sahan\\Downloads\\dataset_my-task_2020-07-08_16-55-57-529.csv")
 ```
 
-#Are sidecars more interactive than just an image post.
-- The interactiveness of a post will be measures by likes and comments received
+#1) Are sidecars more interactive than just an image post.
+- Side cars are the posts with a slide show of images (more than 1) and image posts are the posts with just one image. Since Purdue AKPsi page didn't post many videos, video posts were removed from the analysis
+- __Hypothesis: Since people have short attention spans and are typically lazy, people would be more interested in image posts than sidecars. And therefore, they would be more likely to like an image post than a side car post__
+- The interactiveness of a post will be measured by likes and comments received
 
 ```{r}
 #table(instagram_post_data$type)
@@ -43,7 +43,7 @@ instagram_post_data %>%
                                    size = 1),
     axis.text = element_text(color = "white"),
     axis.title = element_text(color = "white"),
-    plot.title = element_text(color = "white", hjust = "0.5"),
+    plot.title = element_text(color = "white", hjust = "0.4"),
     plot.caption = element_text(color = "white"),
     panel.grid.minor.x = element_blank(),
     panel.grid.major.x = element_blank(),
@@ -54,6 +54,9 @@ instagram_post_data %>%
   coord_flip()
 ```
 
+
+- This graph shows that not only is the median of likes for sidecar posts higher that that of image posts, the mode of likes is also greater for sidecar posts as displayed in the violin plot. 
+
 ```{r}
 instagram_post_data %>% 
   filter(type != "Video") %>% 
@@ -62,28 +65,36 @@ instagram_post_data %>%
   theme_bw() +
   xlab("Types of posts") + ylab("Number of comments") +
   labs(
-    title = "Distribution of likes for sidecars and images",
+    title = "Distribution of comments for sidecars and images",
     caption = "Which type of post is more interactive"
   ) +
   theme(
     legend.position = "none",
-    plot.background = element_rect(fill = "#2D68C4",
+    plot.background = element_rect(fill = "#3A5382",
                                    colour = "black",
                                    size = 1),
     axis.text = element_text(color = "white"),
     axis.title = element_text(color = "white"),
-    plot.title = element_text(color = "white", hjust = "0.5"),
-    plot.caption = element_text(color = "white")
+    plot.title = element_text(color = "white", hjust = "0.4"),
+    plot.caption = element_text(color = "white"),
+    panel.background = element_rect(fill = "#3A5382", color = "black"),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank()
   ) +
   coord_flip()
 
 ```
 
 
+- Curious to see whether a similar trend would be observed with comments, a bar plot was plotted and yet again, side cars' median comments is greater than the image's posts
+
 - From both these graphs, it can be concluded that sidecars seem to receive more likes and comments in general.
 
-#Does the number of hashtags used for a post correlate to the number of likes
-- I see a lot of public accounts use hashtags for the post to appear in non-follower's feeds. I am interested to see how effective this marketing strategy is.
+#2) Does the number of hashtags used for a post correlate to the number of likes
+- I see a lot of public accounts use hashtags for the post to appear in non-follower's feeds. I am interested to see how effective this strategy is
+- __Hypothesis : There will be a positive relationship between the number of hashtags and the number of likes till a certain point. After this saturation point, the number of likes will slowly decrease__
 
 
 ```{r} 
@@ -105,15 +116,46 @@ for (row in 1:nrow(instagram_post_data)) {
   }
 ```
 
+- A scatter plot can be useful in understanding the relationship between number of hashtags in a post and the number if likes for that post.
+```{r warning = FALSE, message = FALSE}
+instagram_post_data %>% 
+  filter(hashtagCount > 0 ) %>% 
+  ggplot(aes(x = hashtagCount, y = likesCount)) +
+  geom_jitter() +
+  geom_smooth(color = "#8E6F3E", width = 1.2, fill = "#CFB991") +
+  xlab("Number of hashtags") + ylab("Number of likes per post") +
+  labs(title = "Scatter plot of number of hashtags and number of likes per post",
+       caption = "What is the optimal number of hashtags")  +
+  theme_bw() +
+  theme(
+    plot.title = element_text(hjust = "0.5")
+  )
+  
+
+```
+
+
+- Although the line of best fit doesn't capture all the observations properly,  the number of likes appears to peak at a certain point ( 20 hashtags) after which there is a decline in the number of likes.
 - This is what the distributions of hashtagcount variable is
 
 ```{r message = FALSE}
 instagram_post_data %>% 
   ggplot(aes(x = hashtagCount)) +
-  geom_histogram() +
+  geom_histogram(color = "#8E6F3E",
+           fill = "#CFB991",
+           size = 1.2) +
   geom_density() +
-  theme_bw()
+  xlab("Number of hashtags per post") + ylab("Number of posts") +
+  labs(
+    title = "Histogram showing the distribution of hashtags per post among all posts",
+    caption = "What is the optimal number of hashtags?") +
+  theme_minimal() +
+  theme (
+    plot.title = element_text(hjust = "0.5")
+  )
 ```
+
+- This shows that most of our posts have less than 10 hashtags.
 
 - This distribution is used to keep only hashtagcounts with over 6 posts to remove outliers
 ```{r message = FALSE}
@@ -128,25 +170,20 @@ instagram_post_data %>%
            fill = "#CFB991",
            size = 1.2) +
   xlab("Number of Hashtags") + ylab("Average likes") +
-  labs(title = "Bar Chart of Average Likes for posts of different number of hashtags") +
-  theme_classic()
-  # theme(
-  #   panel.background = element_rect(fill = "black", color = "white"),
-  #   plot.background = element_rect(fill = "black"),
-  #   axis.text = element_text(color = "white"),
-  #   axis.title = element_text(color = "white"),
-  #   plot.title = element_text(color = "white", hjust = "0.5"),
-  #   panel.grid.major.x = element_blank(),
-  #   panel.grid.minor.x = element_blank(),
-  #   panel.grid.major.y = element_blank(),
-  #   panel.grid.minor.y = element_blank()
-  # )
+  labs(title = "Bar Chart of Average Likes for posts of different number of hashtags",
+       caption = "What is the optimal number of hashtags") +
+  theme_classic() +
+  theme(
+    plot.title = element_text(hjust = "0.5")
+  )
 ```
 
-- From this graph, I understand that there is a high correlation betweeen the number of hashtags and number of likes on a post.
-- __NOTE: Correlation does not mean causation. I am, in no way, a causal inference expert deduce anything like that.__ But I can analyze patterns.
+- From this graph, it can be understood that there is a high correlation betweeen the number of hashtags and number of likes on a post, at least up until 18 hashtags.
+- __NOTE: Correlation does not mean causation. I am, in no way, a causal inference expert deduce anything like that. But, I can analyze patterns.__
+- 18 hashatgs also appears to be the optimal number of hashtags
 
-#What are the most effective hashtags then?
+
+#3) What are the most effective hashtags then?
 - The last research question led me to wonder what hashtags are effective in bringing likes and comments. What hashtags bring the most public attention. 
 
 ```{r}
@@ -154,15 +191,36 @@ hashtag_data <- instagram_post_data %>%
   pivot_longer(hashtagcols,
                names_to = "HashtagNo",
                values_to = "HashtagDesc") %>% 
-  filter(HashtagDesc != "")
+  filter(HashtagDesc != "") %>% 
+  mutate(likeContrib = likesCount/ hashtagCount)
+
 hashtag_data %>% 
   group_by(HashtagDesc) %>% 
   summarize(avg_likes = mean(likesCount), count = n()) %>% 
-  filter(count > 10) %>% 
-  arrange(avg_likes)
   filter(count >= 16) %>% 
   ggplot(aes(x = HashtagDesc)) +
   geom_bar(aes(y = avg_likes), 
            stat = "identity") +
   theme_bw()
+
 ```
+
+- From the looks of this graph, hashtags with appropriate capitalized letters have higher average likes
+- However, these results might be biased by posts with many hashtags. To remove this potential factor (number of hashtags) from the analysis,  I looked at the avg likes per hashtag or like contribution that each hashtag brings instead of looking at the average likes per post.
+-So if a post received 50 likes and used 10 hashtags, the like contribution for each hashtag in the post would be 5 likes
+- __NOTE: I am assuming in this analysis that each hashtag of a post has an equal contribution to the likes of the post__
+
+```{r}
+hashtag_data %>% 
+  group_by(HashtagDesc) %>% 
+  summarize(avg_likesContrib = mean(likeContrib), count = n()) %>% 
+  filter(count > 15) %>% 
+  ggplot(aes(x = HashtagDesc)) +
+  geom_bar(aes(y = avg_likesContrib), 
+           stat = "identity") +
+  theme_bw()
+  
+
+```
+
+- It seems as if the opposite can be inferred from this graph where the hashtags with a lack of capitalization contribute more to the 
