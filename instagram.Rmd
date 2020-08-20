@@ -15,6 +15,8 @@ library(tidyverse)
 
 ```{r echo = FALSE}
 instagram_post_data <- read.csv("C:\\Users\\sahan\\Downloads\\dataset_my-task_2020-07-08_16-55-57-529.csv")
+instagram_post_data_clean <- instagram_post_data %>% 
+  separate(timestamp, c("Date", "Time"), "T")
 ```
 
 #1) Are sidecars more interactive than just an image post.
@@ -27,8 +29,8 @@ instagram_post_data <- read.csv("C:\\Users\\sahan\\Downloads\\dataset_my-task_20
 instagram_post_data %>% 
   filter(type != "Video") %>% 
   ggplot(aes(x = type, y = likesCount)) +
-  geom_violin(size = 1.2, color = "#ED8B00", fill = "#3A5382") +
-  geom_boxplot(width = 0.2, fill = "#EAAA00", color = "#ED8B00") +
+  geom_violin(size = 1.2, color = "#3A5382") +
+  geom_boxplot(width = 0.2, fill = "#2D68C4", color = "#3A5382", size = 1.2) +
   theme_bw() +
   xlab("Types of posts") + ylab("Number of likes") +
   labs(
@@ -36,21 +38,24 @@ instagram_post_data %>%
     caption = "Which type of post is more interactive"
   ) +
   scale_y_continuous(breaks = c(25, 50, 75, 100, 125)) +
-  theme(
-    legend.position = "none",
-    plot.background = element_rect(fill = "#3A5382",
-                                   colour = "black",
-                                   size = 1),
-    axis.text = element_text(color = "white"),
-    axis.title = element_text(color = "white"),
-    plot.title = element_text(color = "white", hjust = "0.4"),
-    plot.caption = element_text(color = "white"),
-    panel.grid.minor.x = element_blank(),
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.y = element_blank(),
-    panel.grid.major.y = element_blank(),
-    panel.background = element_rect(fill = "#3A5382")
+  theme (
+    plot.title = element_text(hjust = "0.4")
   ) +
+  # theme(
+  #   legend.position = "none",
+  #   plot.background = element_rect(fill = "#3A5382",
+  #                                  colour = "black",
+  #                                  size = 1),
+  #   axis.text = element_text(color = "white"),
+  #   axis.title = element_text(color = "white"),
+  #   plot.title = element_text(color = "white", hjust = "0.4"),
+  #   plot.caption = element_text(color = "white"),
+  #   panel.grid.minor.x = element_blank(),
+  #   panel.grid.major.x = element_blank(),
+  #   panel.grid.minor.y = element_blank(),
+  #   panel.grid.major.y = element_blank(),
+  #   panel.background = element_rect(fill = "#3A5382")
+  # ) +
   coord_flip()
 ```
 
@@ -61,27 +66,15 @@ instagram_post_data %>%
 instagram_post_data %>% 
   filter(type != "Video") %>% 
   ggplot(aes(x = type, y = commentsCount)) +
-  geom_boxplot(size = 1.2, width = 0.3, fill = "#EAAA00", color = "#ED8B00") +
+  geom_boxplot(width = 0.3, fill = "#2D68C4", color = "#3A5382", size = 1.0) +
   theme_bw() +
   xlab("Types of posts") + ylab("Number of comments") +
   labs(
     title = "Distribution of comments for sidecars and images",
     caption = "Which type of post is more interactive"
   ) +
-  theme(
-    legend.position = "none",
-    plot.background = element_rect(fill = "#3A5382",
-                                   colour = "black",
-                                   size = 1),
-    axis.text = element_text(color = "white"),
-    axis.title = element_text(color = "white"),
-    plot.title = element_text(color = "white", hjust = "0.4"),
-    plot.caption = element_text(color = "white"),
-    panel.background = element_rect(fill = "#3A5382", color = "black"),
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank(),
-    panel.grid.major.y = element_blank(),
-    panel.grid.minor.y = element_blank()
+  theme (
+    plot.title = element_text(hjust = "0.4")
   ) +
   coord_flip()
 
@@ -122,7 +115,7 @@ instagram_post_data %>%
   filter(hashtagCount > 0 ) %>% 
   ggplot(aes(x = hashtagCount, y = likesCount)) +
   geom_jitter() +
-  geom_smooth(color = "#8E6F3E", width = 1.2, fill = "#CFB991") +
+  geom_smooth(width = 1.2, fill = "#EAAA00", color = "#ED8B00") +
   xlab("Number of hashtags") + ylab("Number of likes per post") +
   labs(title = "Scatter plot of number of hashtags and number of likes per post",
        caption = "What is the optimal number of hashtags")  +
@@ -141,9 +134,9 @@ instagram_post_data %>%
 ```{r message = FALSE}
 instagram_post_data %>% 
   ggplot(aes(x = hashtagCount)) +
-  geom_histogram(color = "#8E6F3E",
-           fill = "#CFB991",
-           size = 1.2) +
+  geom_histogram(fill = "#EAAA00", 
+                 color = "#ED8B00",
+                 size = 1.2) +
   geom_density() +
   xlab("Number of hashtags per post") + ylab("Number of posts") +
   labs(
@@ -165,14 +158,12 @@ instagram_post_data %>%
   filter (count >= 6) %>% 
   ggplot(aes(x = as.factor(hashtagCount))) +
   geom_bar(aes(y = meanLikes),
-           stat = "identity",
-           color = "#8E6F3E",
-           fill = "#CFB991",
+           stat = "identity", fill = "#EAAA00", color = "#ED8B00",
            size = 1.2) +
   xlab("Number of Hashtags") + ylab("Average likes") +
   labs(title = "Bar Chart of Average Likes for posts of different number of hashtags",
        caption = "What is the optimal number of hashtags") +
-  theme_classic() +
+  theme_minimal() +
   theme(
     plot.title = element_text(hjust = "0.5")
   )
@@ -183,8 +174,11 @@ instagram_post_data %>%
 - 18 hashatgs also appears to be the optimal number of hashtags
 
 
+
+
 #3) What are the most effective hashtags then?
 - The last research question led me to wonder what hashtags are effective in bringing likes and comments. What hashtags bring the most public attention. 
+- __Hypothesis : The less specific hashtags like purdue and university are the most effective__
 
 ```{r}
 hashtag_data <- instagram_post_data %>% 
@@ -200,8 +194,18 @@ hashtag_data %>%
   filter(count >= 16) %>% 
   ggplot(aes(x = HashtagDesc)) +
   geom_bar(aes(y = avg_likes), 
-           stat = "identity") +
-  theme_bw()
+           stat = "identity", fill = "#2D68C4", color = "#3A5382", size = 1.2) +
+  labs(
+    title = "Bar Chart of Avg likes for posts with this selection of hashtags",
+    caption = "What are the most effective hashtags then?",
+    x = "Hashtag Name",
+    y = "Average likes per post"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = "0.4"),
+    axis.text.x = element_text(angle = 45, vjust = "0.5")
+  )
 
 ```
 
@@ -209,18 +213,91 @@ hashtag_data %>%
 - However, these results might be biased by posts with many hashtags. To remove this potential factor (number of hashtags) from the analysis,  I looked at the avg likes per hashtag or like contribution that each hashtag brings instead of looking at the average likes per post.
 -So if a post received 50 likes and used 10 hashtags, the like contribution for each hashtag in the post would be 5 likes
 - __NOTE: I am assuming in this analysis that each hashtag of a post has an equal contribution to the likes of the post__
-
-```{r}
+- A more appropiate analysis of like contribution can be done from ridge plots that will show the distribution of like contribution for each type of hashtage. This plot only displays hashtags that appear in more than 15 posts. This subsetting ensures a lack of bias 
+```{r echo = FALSE, fig.show='hide'}
 hashtag_data %>% 
   group_by(HashtagDesc) %>% 
   summarize(avg_likesContrib = mean(likeContrib), count = n()) %>% 
   filter(count > 15) %>% 
   ggplot(aes(x = HashtagDesc)) +
   geom_bar(aes(y = avg_likesContrib), 
-           stat = "identity") +
-  theme_bw()
+           stat = "identity",
+           fill = "#2D68C4", color = "#3A5382", size = 1.2) +
+  labs(
+    title = "Bar Chart of Avg like contribution for this selection of hashtags",
+    caption = "What are the most effective hashtags then?",
+    x = "Hashtag Name",
+    y = "Average like contribution"
+  ) +
+  theme_classic()  +
+  theme(
+    plot.title = element_text(hjust = "0.4"),
+    axis.text.x = element_text(angle = 45, vjust = "0.5")
+  )
   
 
 ```
 
-- It seems as if the opposite can be inferred from this graph where the hashtags with a lack of capitalization contribute more to the 
+
+```{r echo= FALSE}
+tt <- table(hashtag_data$HashtagDesc)
+
+```
+
+```{r}
+library(ggridges)
+hashtag_data[hashtag_data$HashtagDesc %in% names(tt[tt >15]),] %>% 
+  ggplot(aes(x = likeContrib, y = HashtagDesc)) +
+  geom_density_ridges(rel_min_height = 0.01, fill = "#2D68C4", color = "#3A5382", size = 1.0) +
+  labs(
+    title = "Ridge Plots of like contribution for this selection of hashtags",
+    caption = "What are the most effective hashtags then?",
+    x = "Like contribution",
+    y = "Hashtag Name"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = "0.4")
+  )
+```
+
+
+- It can be derived from the plot that Purdue-related hashtags have very similar distributions with mode at around 5 likes (contribution)
+- __akpsi__, __university__, and __piomega__ have different distributions than that of the the purdue-related ones.
+- __university__'s distribution is bimodal but it's actual mode seems to be at around 9 likes (contribution)
+- Both __akpsi__ and __piomega__ have modes at around 7.
+
+
+
+#4) An optimal day of the week?
+
+
+```{r}
+library(stringr)
+library(lubridate)
+library(ggbeeswarm)
+instagram_post_data_clean$Date <- as.Date(instagram_post_data_clean$Date)
+instagram_post_data_clean %>% 
+  mutate(wday = weekdays(Date)) %>% 
+  ggplot(aes(x = wday, y = likesCount)) +
+  geom_boxplot(fill = "#EAAA00", color = "#ED8B00",
+           size = 1.0, alpha = 0.8) +
+  labs(
+    x = "Number of Likes",
+    y = "Day of the week",
+    title = "Distribution of likes for different days of the week",
+    caption = "What is the best day of the week to post on?"
+  ) +
+  scale_x_discrete(limits = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")) +
+  scale_y_continuous(breaks = c(0, 25, 50, 75, 100, 125)) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = "0.4")
+  )
+
+
+```
+
+- From this graph, we can tell that posts published on Sundays and Saturdays to bring the least likes
+- But, posts from Fridays, Thursday or in the middle of the week produced more likes in general
+
