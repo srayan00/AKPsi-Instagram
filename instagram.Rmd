@@ -114,7 +114,7 @@ for (row in 1:nrow(instagram_post_data)) {
 instagram_post_data %>% 
   filter(hashtagCount > 0 ) %>% 
   ggplot(aes(x = hashtagCount, y = likesCount)) +
-  geom_jitter() +
+  geom_jitter(color = "#5C2F8C") +
   geom_smooth(width = 1.2, fill = "#EAAA00", color = "#ED8B00") +
   xlab("Number of hashtags") + ylab("Number of likes per post") +
   labs(title = "Scatter plot of number of hashtags and number of likes per post",
@@ -300,4 +300,33 @@ instagram_post_data_clean %>%
 
 - From this graph, we can tell that posts published on Sundays and Saturdays to bring the least likes
 - But, posts from Fridays, Thursday or in the middle of the week produced more likes in general
+
+#5) Time Series Analysis
+- This time series plot shows some of the trends that we have seen over time
+- The trend line uses a generalized additive model to approximate the general trend
+```{r}
+instagram_post_data_clean %>% 
+  ggplot(aes(x = Date, y = likesCount)) +
+  geom_point(color = "#5C2F8C") +
+  geom_smooth(fill = "#2D68C4", color = "#3A5382", size = 1.0, method = "gam") +
+  #geom_line(color = "#3A5382", size = 1.0) +
+  labs(
+    x = "Number of likes",
+    y = "Timestamp",
+    title = "Likes-Time Plot",
+    caption = "Time Series Analysis"
+  ) +
+  theme_minimal() +
+  scale_x_date(date_breaks = "6 month", date_labels = "%b %Y") +
+  scale_y_continuous(breaks = c(0, 25, 50, 75, 100, 125)) +
+  theme(
+    plot.title = element_text(hjust = "0.5"),
+    axis.text.x = element_text(angle = 45),
+    axis.title.x = element_text(vjust = "0.5")
+  )
+
+```
+
+- There is an overall positive trend in the number of likes received on each post
+- There seems to be a dip in likes between July 2018 and June 2019
 
